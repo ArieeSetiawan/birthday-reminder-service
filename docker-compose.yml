@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: birthday-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+    command: npm run dev
+
+  # worker:
+  #   build: .
+  #   container_name: birthday-worker
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     - NODE_ENV=development
+  #   volumes:
+  #     - .:/app
+  #   command: npm run worker
+
+  mongo:
+    image: mongo:6
+    container_name: birthday-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
