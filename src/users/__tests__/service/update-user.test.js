@@ -3,12 +3,19 @@ jest.mock('../../model');
 const Users = require('../../model');
 const service = require('../../service');
 
+jest.mock('../../../config/agenda', () => ({
+  agenda: {
+    cancel: jest.fn().mockResolvedValue(),
+    schedule: jest.fn().mockResolvedValue()
+  }
+}));
+
 it('should update user if exists', async () => {
   Users.findOneAndUpdate.mockResolvedValue({
     _id: '1',
     name: 'Updated',
     email: 'test@test.com',
-    birthday: new Date(),
+    birthday: '1999-01-01',
     timezone: 'Asia/Jakarta'
   });
 
@@ -18,7 +25,7 @@ it('should update user if exists', async () => {
     id: '1',
     name: 'Updated',
     email: 'test@test.com',
-    birthday: expect.any(Date),
+    birthday: '1999-01-01',
     timezone: 'Asia/Jakarta'
   });
 });

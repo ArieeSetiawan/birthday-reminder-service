@@ -4,6 +4,13 @@ const { HttpError } = require('../../../lib/error');
 
 jest.mock('../../model');
 
+jest.mock('../../../config/agenda', () => ({
+  agenda: {
+    cancel: jest.fn().mockResolvedValue(),
+    schedule: jest.fn().mockResolvedValue()
+  }
+}));
+
 describe('UserService.createUser', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -14,7 +21,9 @@ describe('UserService.createUser', () => {
     Users.create.mockResolvedValue({
       _id: '123',
       name: 'Arie',
-      email: 'arie@test.com'
+      email: 'arie@test.com',
+      birthday: '1999-01-01',
+      timezone: 'Asia/Jakarta'
     });
 
     const result = await service.createUser({
@@ -31,7 +40,7 @@ describe('UserService.createUser', () => {
   it('should throw error if email already exists', async () => {
     Users.findOne.mockResolvedValue({
       _id: '123',
-      email: 'dup@test.com'
+      email: 'dup@test.com',
     });
     
     await expect(

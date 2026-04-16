@@ -8,13 +8,24 @@ function mustGet(key) {
   return value;
 }
 
+const emailActive = process.env.EMAIL_IS_ACTIVE === 'true';
+
 const env = {
   port: parseInt(process.env.PORT || '3000', 10),
-  nodeEnv: process.env.NODE_ENV || 'development',
+  environment: process.env.NODE_ENV || 'development',
   mongoUri: mustGet('MONGO_URI'),
-  cron: process.env.CHECK_INTERVAL_CRON || '* * * * *',
   birthdayHour: parseInt(process.env.BIRTHDAY_HOUR || '9', 10),
-  logLevel: process.env.LOG_LEVEL || 'info',
+  email: emailActive
+    ? {
+        isActive: true,
+        host: mustGet('EMAIL_HOST'),
+        port: parseInt(mustGet('EMAIL_PORT'), 10),
+        user: mustGet('EMAIL_USER'),
+        pass: mustGet('EMAIL_PASS'),
+      }
+    : {
+        isActive: false,
+      },
 };
 
 module.exports = env;

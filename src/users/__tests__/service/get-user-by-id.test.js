@@ -3,6 +3,12 @@ const service = require('../../service');
 const Users = require('../../model');
 const { HttpError } = require('../../../lib/error');
 
+jest.mock('../../../config/agenda', () => ({
+  agenda: {
+    cancel: jest.fn().mockResolvedValue(),
+    schedule: jest.fn().mockResolvedValue()
+  }
+}));
 
 describe('UserService.getUserById', () => {
   afterEach(() => {

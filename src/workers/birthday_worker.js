@@ -1,32 +1,64 @@
-import Users from "../models/User.js";
-import { DateTime } from "luxon";
+const agenda = require('../config/agenda');
+const Users = require('../users/model');
+const { calculateNextBirthday } = require('../lib/birthday_calculator');
+const config = require('../config/env.js');
+const emailLib = require("../lib/email");
 
-export async function runBirthdayWorker() {
-  const now = DateTime.utc();
-
-  const users = await Users.find({
-    nextBirthdaySendAt: { $lte: now.toJSDate() },
-  });
-
-  if (!users.length) {
-    console.log("🎂 No birthday users to process");
-    return;
-  }
-
-  for (const user of users) {
+agenda.define(
+  'send birthday',
+  { concurrency: 1 },
+  async (job) => {
+    const { userId } = job.attrs.data;
+    const today = new Date().toISOString().slice(5, 10);
     try {
-      console.log(`🎉 Sent birthday to ${user.name}`);
+      const user = await Users.findById(userId);
+      if (!user) return;
 
-      // recalculate next send time
-      const next = calculateNextBirthdaySendAt(
+      const lastDate = new Date(user.birthday).toISOString().slice(5, 10);
+
+      if(lastDate === today){
+        console.log(`Happy Birthday ${user.name}`)
+        if(config.email.isActive){
+          try{
+            await emailLib.sendEmail({
+              to: user.email,
+              subject: `Happy Birthday ${user.name}`,
+              text: `Happy Birthday ${user.name} wish you all the best`
+            })
+            console.log(`Success Send Email ${user.email}`)
+          }catch(err){
+            console.log(err)
+            console.error(`Fail Send Email ${user.email}`)
+          }
+        }
+      }
+
+      let next = calculateNextBirthday(
         user.birthday,
         user.timezone
       );
 
-      user.nextBirthdaySendAt = next;
-      await user.save();
+      if (!next || isNaN(new Date(next))) {
+        console.error("Invalid next birthday", userId);
+        return;
+      }
+
+      const now = new Date();
+
+      if (next <= now) {
+        next.setFullYear(next.getFullYear() + 1);
+      }
+
+      await agenda.cancel({
+        name: 'send birthday',
+        'data.userId': userId,
+      });
+
+      await agenda.schedule(next, 'send birthday', { userId });
+
     } catch (err) {
-      console.error(`❌ Failed for ${user.name}`, err.message);
+      console.error('Birthday job failed:', err.message);
+      throw err;
     }
   }
-}
+);

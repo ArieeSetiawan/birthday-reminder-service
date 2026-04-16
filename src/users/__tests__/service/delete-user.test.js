@@ -3,6 +3,10 @@ const service = require('../../service');
 const Users = require('../../model');
 const { HttpError } = require('../../../lib/error');
 
+jest.mock('../../../config/agenda', () => ({
+  cancel: jest.fn().mockResolvedValue(),
+  schedule: jest.fn().mockResolvedValue()
+}));
 
 describe('UserService.deleteUser', () => {
   afterEach(() => jest.clearAllMocks());

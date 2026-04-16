@@ -2,6 +2,11 @@ const request = require('supertest');
 const app = require('../../../app');
 const Users = require('../../model');
 
+jest.mock('../../../config/agenda', () => ({
+  cancel: jest.fn().mockResolvedValue(),
+  schedule: jest.fn().mockResolvedValue()
+}));
+
 describe('POST /users', () => {
   afterEach(async () => {
     await Users.deleteMany({});

@@ -3,6 +3,13 @@ const mongoose = require('mongoose');
 const app = require('../../../app');
 const Users = require('../../model');
 
+jest.mock('../../../config/agenda', () => ({
+  agenda: {
+    cancel: jest.fn().mockResolvedValue(),
+    schedule: jest.fn().mockResolvedValue()
+  }
+}));
+
 describe('GET /users/:user_id', () => {
   afterEach(async () => {
     await Users.deleteMany({});

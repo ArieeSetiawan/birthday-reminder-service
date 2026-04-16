@@ -1,12 +1,6 @@
 const Joi = require('joi');
-const { IANAZone } = require('luxon');
+const { validateTimezone } = require('../lib/timezone');
 
-const validateTimezone = (value, helpers) => {
-  if (!IANAZone.isValidZone(value)) {
-    return helpers.error('any.invalid');
-  }
-  return value;
-};
 
 const createUserSchema = Joi.object({
   name: Joi.string().required(),

@@ -2,8 +2,9 @@
 
 const _ = require('lodash');
 const { HttpError } = require('../lib/error')
-const { calculateNextBirthdaySendAt } = require('../lib/birthday_calculator')
 const Users = require('./model');
+const { scheduleBirthday } = require('../lib/birthday_calculator');
+const agenda = require('../config/agenda');
 
 class UserService {
     /**
@@ -22,16 +23,9 @@ class UserService {
         throw new HttpError(400, "Email Already Exists");
       }
 
-      const nextBirthdaySendAt = calculateNextBirthdaySendAt(
-        data.birthday,
-        data.timezone
-      );
+      const user = await Users.create(data)
 
-      const user = await Users.create({
-        ...data,
-        nextBirthdaySendAt
-      }
-      );
+      await scheduleBirthday(user)
 
        return {
         id: user._id,
@@ -87,6 +81,8 @@ class UserService {
         throw new HttpError(404, "User Not Found");
       }
 
+      await scheduleBirthday(user)
+
       return {
         id: user._id,
         name: user.name,
@@ -119,6 +115,11 @@ class UserService {
     if (!user) {
       throw new HttpError(404, "User Not Found");
     }
+
+    await agenda.cancel({
+      name: "send birthday",
+      "data.userId" : id
+    })
 
    return {
     message: "User deleted successfully",

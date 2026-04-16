@@ -1,25 +1,44 @@
-import { DateTime } from "luxon";
+const { DateTime } = require("luxon");
+const agenda = require("../config/agenda");
 
-export function calculateNextBirthdaySendAt(birthday, timezone) {
+function calculateNextBirthday(birthday, timezone) {
   const now = DateTime.now().setZone(timezone);
+  
+  const date = DateTime.fromJSDate(birthday).setZone(timezone);
 
-  const [year, month, day] = birthday.split("-").map(Number);
+  let next = date.set({
+    year: now.year,
+    hour: process.env.BIRTHDAY_HOUR || 9,
+    minute: 0,
+    second: 0,
+  });
 
-  let next = DateTime.fromObject(
-    {
-      year: now.year,
-      month,
-      day,
-      hour: 9,
-      minute: 0,
-      second: 0,
-    },
-    { zone: timezone }
-  );
-
-  if (next < now) {
-    next = next.plus({ years: 1 });
+  if (next <= now) {
+    next = next.plus({ years: 1 })
   }
 
   return next.toUTC().toJSDate();
 }
+
+async function scheduleBirthday(user) {
+  const next = calculateNextBirthday(
+    user.birthday,
+    user.timezone
+  );
+
+  if (!next || isNaN(new Date(next))) {
+  console.error("Invalid next birthday date", user.id);
+  return;
+}
+
+  await agenda.cancel({ "data.userId": user._id });
+
+  await agenda.schedule(next, "send birthday", {
+    userId: user._id,
+  });
+}
+
+module.exports = {
+  calculateNextBirthday,
+  scheduleBirthday,
+};

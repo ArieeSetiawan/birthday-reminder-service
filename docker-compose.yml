@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -7,23 +7,29 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mongo
-    environment:
-      - NODE_ENV=development
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
     volumes:
       - .:/app
+      - /app/node_modules
     command: npm run dev
+    restart: unless-stopped
 
-  # worker:
-  #   build: .
-  #   container_name: birthday-worker
-  #   depends_on:
-  #     - mongo
-  #   environment:
-  #     - NODE_ENV=development
-  #   volumes:
-  #     - .:/app
-  #   command: npm run worker
+  worker:
+    build: .
+    container_name: birthday-worker
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run worker
+    restart: unless-stopped
 
   mongo:
     image: mongo:6
@@ -32,6 +38,13 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
 volumes:
   mongo_data:

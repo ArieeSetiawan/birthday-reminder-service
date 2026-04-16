@@ -1,12 +1,10 @@
-const { DateTime } = require('luxon');
+const { IANAZone } = require('luxon');
 
-const isValidTimezone = (tz) => {
-  try {
-    DateTime.now().setZone(tz);
-
-    // Luxon returns "Invalid DateTime" if bad zone
-    return DateTime.now().setZone(tz).isValid;
-  } catch (err) {
-    return false;
+const validateTimezone = (value, helpers) => {
+  if (!IANAZone.isValidZone(value)) {
+    return helpers.error('any.invalid');
   }
+  return value;
 };
+
+module.exports = { validateTimezone }
