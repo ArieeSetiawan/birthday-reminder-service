@@ -200,16 +200,15 @@ A Postman collection is included for easy API testing and local development.
 1. Open **Postman**
 2. Click **Import**
 3. Select both files from the `/postman` folder
-4. Choose the environment (e.g. `Birthday Reminder Dev`)
-5. Ensure `base_url` is set correctly (default: `http://localhost:3000`)
+4. Ensure `base_url` is set correctly (default: `http://localhost:3000`)
 
 ---
 
 ### ⚙️ Environment Variables
 
 | Key       | Example Value           |
-|----------|------------------------|
-| base_url | http://localhost:3000 |
+|---------- |-------------------------|
+| base_url  |  http://localhost:3000  |
 
 ---
 
