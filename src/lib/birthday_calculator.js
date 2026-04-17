@@ -33,9 +33,8 @@ function calculateNextBirthday(birthday, timezone) {
  * Ensures only one active job per user.
  *
  * @param {Object} user
- * @param {Object} session
  */
-async function scheduleBirthday(user, session) {
+async function scheduleBirthday(user) {
   const next = calculateNextBirthday(
     user.birthday,
     user.timezone

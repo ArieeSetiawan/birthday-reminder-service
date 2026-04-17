@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     timezone: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
+    lastBirthdaySentYear: { type: Number, default: null }
   },
   { timestamps: true }
 );
