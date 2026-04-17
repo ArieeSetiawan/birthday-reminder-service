@@ -1,6 +1,5 @@
 'use strict'
 
-const _ = require('lodash');
 const { HttpError } = require('../lib/error')
 const Users = require('./model');
 const { scheduleBirthday } = require('../lib/birthday_calculator');
@@ -49,7 +48,7 @@ class UserService {
         isDeleted: { $ne: true }
       });
 
-      if (_.isEmpty(user)) {
+      if (!user) {
         throw new HttpError(404, "User Not Found");
       }
 
@@ -78,7 +77,7 @@ class UserService {
         { new: true }
       )
 
-      if (_.isEmpty(user)) {
+      if (!user) {
         throw new HttpError(404, "User Not Found");
       }
 
