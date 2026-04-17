@@ -6,7 +6,7 @@ const emailLib = require("../lib/email");
 
 agenda.define(
   'send birthday',
-  { concurrency: 1 },
+  { concurrency: config.workerConcurrency },
   async (job) => {
     const { userId } = job.attrs.data;
     const today = new Date().toISOString().slice(5, 10);

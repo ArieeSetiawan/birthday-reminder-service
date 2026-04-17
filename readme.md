@@ -228,3 +228,43 @@ A Postman collection is included for easy API testing and local development.
 - Ensure backend server is running before testing:
 ```bash
 docker compose up --build
+```
+
+## 📌 Assumptions, Limitations & Design Decisions
+
+---
+
+### 🧠 Assumptions
+
+- Each user has a valid IANA timezone
+- Birthday is stored as a valid ISO 8601 date
+- System runs continuously (no long offline period handling)
+- Email delivery is assumed to succeed when SMTP is configured
+- One active birthday job per user is sufficient
+
+---
+
+### ⚠️ Limitations
+
+- No retry mechanism for failed email delivery
+- No dead-letter queue for failed Agenda jobs
+- No distributed locking across multiple workers (possible duplicate scheduling in rare edge cases)
+- No observability system (e.g. Grafana, CloudWatch)
+- MongoDB is a single coordination point (no multi-region setup)
+- Limited rate-limiting for email sending
+
+---
+
+### 🏗️ Design Decisions
+
+- **Agenda.js used instead of cron** → Enables persistent, database-backed job scheduling
+
+- **Worker separated from API** → Improves scalability and separation of concerns
+
+- **Timezone handled during scheduling** → Ensures correct execution per user locale
+
+- **Soft delete (`isDeleted`) instead of hard delete** → Preserves data integrity and auditability
+
+- **One job per user policy** → Prevents duplicate email sending and simplifies scheduling logic
+
+- **Config-driven system (env-based)** → Enables environment flexibility and easier scaling

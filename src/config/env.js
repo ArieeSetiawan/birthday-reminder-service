@@ -15,6 +15,7 @@ const env = {
   environment: process.env.NODE_ENV || 'development',
   mongoUri: mustGet('MONGO_URI'),
   birthdayHour: parseInt(process.env.BIRTHDAY_HOUR || '9', 10),
+  workerConcurrency: parseInt(process.env.WORKER_CONCURRENCY || '1', 10),
   email: emailActive
     ? {
         isActive: true,
