@@ -13,15 +13,15 @@ describe('UserService.deleteUser', () => {
 
   it('should soft delete user', async () => {
     Users.findOneAndUpdate.mockResolvedValue({
-      _id: '69df0f45e932d37394b0bf000',
+      _id: '69e1a6486a997254541d192c',
       isDeleted: true
     });
 
-    const result = await service.deleteUser('69df0f45e932d37394b0bf000');
+    const result = await service.deleteUser('69e1a6486a997254541d192c');
 
     expect(Users.findOneAndUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        _id: '69df0f45e932d37394b0bf000'
+        _id: '69e1a6486a997254541d192c'
       }),
       expect.any(Object),
       expect.any(Object)

@@ -3,6 +3,10 @@ const config = require('../config/env.js');
 
 let transporter;
 
+/**
+ * Initializes and caches Nodemailer transporter.
+ * Uses Ethereal in development and SMTP config in production.
+ */
 async function initEmail() {
   if (transporter) return transporter;
 
@@ -35,6 +39,17 @@ async function initEmail() {
   return transporter;
 }
 
+/**
+ * Sends an email using configured transporter.
+ * Logs preview URL in non-production environments.
+ *
+ * @param {Object} params
+ * @param {string} params.to
+ * @param {string} params.subject
+ * @param {string} [params.text]
+ * @param {string} [params.html]
+ * @returns {Promise<Object>} Nodemailer response
+ */
 async function sendEmail({ to, subject, text, html }) {
   const t = await initEmail();
 

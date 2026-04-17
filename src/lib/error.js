@@ -28,26 +28,4 @@ var HttpError = function(code, message, meta) {
 }
 require('util').inherits(HttpError, Error);
 
-var UnauthorizedError = function(){
-    Error.captureStackTrace(this, this.constructor);
-
-    this.code = 403;
-    this.message = "You don't have permission to do operation";
-}
-
-var PayloadError = function(code, message, payload){
-
-  Error.captureStackTrace(this, this.constructor)
-
-  this.code = code || 400;
-  this.payload = payload || {};
-  this.message = message;
-
-}
-
-require('util').inherits(UnauthorizedError, HttpError);
-require('util').inherits(PayloadError, HttpError);
-
 module.exports.HttpError = HttpError;
-module.exports.UnauthorizedError = UnauthorizedError;
-module.exports.PayloadError = PayloadError;

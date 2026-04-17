@@ -1,0 +1,117 @@
+{
+  "info": {
+    "_postman_id": "dbfd812b-272d-4b2f-a5ac-5e8c34119c0c",
+    "name": "Birthday Reminder",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21078919"
+  },
+  "item": [
+    {
+      "name": "Create Users",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"The User Update the job?\",\r\n  \"email\": \"usertest@example.com\",\r\n  \"birthday\": \"1999-04-17\",\r\n  \"timezone\": \"Asia/Jakarta\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/:user_id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            ":user_id"
+          ],
+          "variable": [
+            {
+              "key": "user_id",
+              "value": "69e1a5c0400726b80511f14b"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User by ID",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"User Update\",\r\n  \"birthday\": \"2005-12-16\",\r\n  \"timezone\": \"America/Sao_Paulo\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/users/:user_id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            ":user_id"
+          ],
+          "variable": [
+            {
+              "key": "user_id",
+              "value": "69e1a5c0400726b80511f14b"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete User by ID",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/:user_id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            ":user_id"
+          ],
+          "variable": [
+            {
+              "key": "user_id",
+              "value": "69e1a6486a997254541d192a"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

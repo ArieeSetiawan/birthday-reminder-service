@@ -1,6 +1,14 @@
 const { DateTime } = require("luxon");
 const agenda = require("../config/agenda");
 
+/**
+ * Get next birthday occurrence in UTC based on user timezone.
+ * If this year's birthday has passed, returns next year.
+ *
+ * @param {Date|string} birthday
+ * @param {string} timezone
+ * @returns {Date} UTC date for scheduling
+ */
 function calculateNextBirthday(birthday, timezone) {
   const now = DateTime.now().setZone(timezone);
   
@@ -20,7 +28,14 @@ function calculateNextBirthday(birthday, timezone) {
   return next.toUTC().toJSDate();
 }
 
-async function scheduleBirthday(user) {
+/**
+ * Schedules (and replaces) a user's birthday reminder job.
+ * Ensures only one active job per user.
+ *
+ * @param {Object} user
+ * @param {Object} session
+ */
+async function scheduleBirthday(user, session) {
   const next = calculateNextBirthday(
     user.birthday,
     user.timezone

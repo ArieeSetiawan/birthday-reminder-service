@@ -5,6 +5,7 @@ const { HttpError } = require('../lib/error')
 const Users = require('./model');
 const { scheduleBirthday } = require('../lib/birthday_calculator');
 const agenda = require('../config/agenda');
+const mongoose = require('mongoose');
 
 class UserService {
     /**
@@ -17,24 +18,24 @@ class UserService {
      * @throws {HttpError} 400 if email already exists
      */
     async createUser(data) {
-      const existUser = await this.getUserByEmail(data.email);
-
-      if (existUser) {
-        throw new HttpError(400, "Email Already Exists");
-      }
-
+        const existUser = await this.getUserByEmail(data.email);
+  
+        if (existUser) {
+          throw new HttpError(400, "Email Already Exists");
+        }
+  
       const user = await Users.create(data)
-
+  
       await scheduleBirthday(user)
-
-       return {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        birthday: user.birthday,
-        timezone: user.timezone,
-        created_at: user.createdAt
-      };
+  
+         return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          birthday: user.birthday,
+          timezone: user.timezone,
+          created_at: user.createdAt
+        };
     }
 
     /**
@@ -97,35 +98,35 @@ class UserService {
      * @param {string} id - User ID (MongoDB ObjectId)
      * @throws {HttpError} 404 if user not found
      */
-   async deleteUser(id) {
-    const user = await Users.findOneAndUpdate(
-      {
-        _id: id,
-        isDeleted: { $ne: true }
-      },
-      {
-        $set: {
-          deletedAt: new Date(),
-          isDeleted: true
+    async deleteUser(id) {
+        const user = await Users.findOneAndUpdate(
+          {
+            _id: id,
+            isDeleted: { $ne: true }
+          },
+          {
+            $set: {
+              deletedAt: new Date(),
+              isDeleted: true
+            }
+          },
+          { new: true }
+        );
+
+        if (!user) {
+          throw new HttpError(404, "User Not Found");
         }
-      },
-      { new: true}
-    );
 
-    if (!user) {
-      throw new HttpError(404, "User Not Found");
+        await agenda.cancel({
+          name: "send birthday",
+          "data.userId": new mongoose.Types.ObjectId(id)
+        });
+
+        return {
+          message: "User deleted successfully",
+          id
+        };
     }
-
-    await agenda.cancel({
-      name: "send birthday",
-      "data.userId" : id
-    })
-
-   return {
-    message: "User deleted successfully",
-    id
-  };
-  }
 
     /**
      * Get User by Email
@@ -133,7 +134,10 @@ class UserService {
      * @throws {HttpError} 404 if user not found
      */
     async getUserByEmail(email) {
-      return Users.findOne({ email });
+      return Users.findOne({ 
+        email: email.toLowerCase(),
+        isDeleted: { $ne: true } 
+      });
     }
 }
 

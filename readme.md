@@ -19,7 +19,7 @@ This service runs a background worker that:
 
 ## 🧱 Architecture
 
-APP (API) -> MongoDB -> Worker (Agenda) -> Email
+Client -> API (Express) -> MongoDB -> Worker (Agenda) -> Email Service
 
 ---
 
@@ -53,6 +53,13 @@ git clone https://github.com/ArieeSetiawan/birthday-reminder-service.git
 
 Create a `.env` file in the project root based on `.env.example`:
 
+## 🧪 Testing
+This project uses **Jest** for unit testing.
+### Run tests
+```bash
+npm run test
+```
+
 ## 🐳 Run with Docker
 ### 1. Build containers and start services
 ```bash
@@ -80,20 +87,21 @@ POST /users
 #### Request Body
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "birthday": "1995-06-15",
+  "name": "The User",
+  "email": "usertest@example.com",
+  "birthday": "1999-04-17",
   "timezone": "Asia/Jakarta"
 }
 ```
 #### Response
 ```json
 {
-  "id": "64f1c2a9b3c1a2d4e5f6a7b8",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "birthday": "1995-06-15",
-  "timezone": "Asia/Jakarta"
+    "id": "69e199f0c624262b01bbf291",
+    "name": "The User",
+    "email": "usertest@example.com",
+    "birthday": "1999-04-17T00:00:00.000Z",
+    "timezone": "Asia/Jakarta",
+    "created_at": "2026-04-17T02:24:48.996Z"
 }
 ```
 #### 🛡️ Validation Rules
@@ -103,37 +111,55 @@ POST /users
 - timezone → required valid IANA timezone
 
 ### 🔍 Get User by ID
+Get a specific user using their unique ID.
+```http
+GET /users/:user_id
+```
+#### Params
 ```markdown
 **user_id**
 - Type: string  
 - Required: Yes  
 - Description: MongoDB ObjectId
 ```
-#### Params
-**user_id**
-- Type: string  
-- Required: Yes  
-- Description: MongoDB ObjectId
+#### Response
+```json
+{
+    "id": "69e199f0c624262b01bbf291",
+    "name": "The User",
+    "email": "usertest@example.com",
+    "birthday": "1999-04-17T00:00:00.000Z",
+    "timezone": "Asia/Jakarta"
+}
+```
 ### ✏️ Update User
 Update user information (partial update supported).
 ```http
 PATCH /users/:user_id
 ```
+#### Params
+```markdown
+**user_id**
+- Type: string  
+- Required: Yes  
+- Description: MongoDB ObjectId
+```
 #### Request Body
 ```json
 {
-  "name": "John Updated",
-  "timezone": "Asia/Singapore"
+  "name": "User Update",
+  "birthday": "2005-04-16",
+  "timezone": "America/Sao_Paulo"
 }
 ```
 #### Response
 ```json
 {
-  "id": "64f1c2a9b3c1a2d4e5f6a7b8",
-  "name": "John Updated",
-  "email": "john@example.com",
-  "birthday": "1995-06-15",
-  "timezone": "Asia/Singapore"
+    "id": "69e199f0c624262b01bbf291",
+    "name": "User Update",
+    "email": "usertest@example.com",
+    "birthday": "2005-04-16T00:00:00.000Z",
+    "timezone": "America/Sao_Paulo"
 }
 ```
 ### 🗑️ Delete User
@@ -151,7 +177,55 @@ DELETE /users/:user_id
 #### Response
 ```json
 {
-  "id": "64f1c2a9b3c1a2d4e5f6a7b8",
-  "message": "User deleted successfully"
+    "message": "User deleted successfully",
+    "id": "69e199f0c624262b01bbf291"
 }
 ```
+
+## 📮 API Testing (Postman)
+
+A Postman collection is included for easy API testing and local development.
+
+---
+
+### 📁 Files
+
+- Collection: `/postman/Birthday-Reminder.postman_collection.json`
+- Environment: `/postman/Birthday-Reminder-Env.json`
+
+---
+
+### 🚀 How to Use
+
+1. Open **Postman**
+2. Click **Import**
+3. Select both files from the `/postman` folder
+4. Choose the environment (e.g. `Birthday Reminder Dev`)
+5. Ensure `base_url` is set correctly (default: `http://localhost:3000`)
+
+---
+
+### ⚙️ Environment Variables
+
+| Key       | Example Value           |
+|----------|------------------------|
+| base_url | http://localhost:3000 |
+
+---
+
+### 📌 Recommended Flow
+
+1. Create User
+2. Get User by ID
+3. Update User
+4. Delete User
+
+---
+
+### 💡 Notes
+
+- All requests use `{{base_url}}` for flexibility across environments
+- Use the returned `user_id` from Create User for other requests
+- Ensure backend server is running before testing:
+```bash
+docker compose up --build
