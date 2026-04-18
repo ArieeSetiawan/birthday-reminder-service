@@ -64,7 +64,8 @@ agenda.define(
       console.error('Birthday job failed:', err.message);
       const failCount = (job.attrs.failCount || 0) + 1;
       if (failCount <= 3) {
-        const delay = (failCount + 1) * 60 * 1000
+        const baseDelay = 60 * 1000
+        const delay = Math.pow(2, failCount - 1) * baseDelay
 
         console.log(`Retrying in ${delay / 1000}s (attempt ${failCount + 1})`);
 

@@ -241,12 +241,13 @@ docker compose up --build
 - System runs continuously (no long offline period handling)
 - Email delivery is assumed to succeed when SMTP is configured
 - One active birthday job per user is sufficient
+- Duplicate job execution is tolerated and prevented via state-based idempotency
 
 ---
 
 ### ⚠️ Limitations
 
-- No retry mechanism for failed email delivery
+- Basic retry mechanism for failed email delivery (limited attempts, no backoff strategy or persistence guarantees)
 - No dead-letter queue for failed Agenda jobs
 - No distributed locking across multiple workers (possible duplicate scheduling in rare edge cases)
 - No observability system (e.g. Grafana, CloudWatch)
