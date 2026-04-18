@@ -39,8 +39,21 @@ agenda.define(
         birthday.getUTCMonth() === now.getUTCMonth();
 
       if (isBirthday) {
-        console.log(`Happy Birthday ${user.name}`);
+        const updated = await Users.findOneAndUpdate(
+          {
+            _id: userId,
+            lastBirthdaySentYear: { $ne: currentYear }
+          },
+          {
+            $set: { lastBirthdaySentYear: currentYear }
+          }
+        );
 
+        if (!updated) {
+          console.log(`Skipped due to atomic lock (already handled or locked) ${user.email}`)
+          return;
+        }
+        console.log(`Happy Birthday ${user.name}`);
         if (config.email.isActive) {
           try{
             await emailLib.sendEmail({
@@ -55,8 +68,6 @@ agenda.define(
             throw err
           }
         }
-        user.lastBirthdaySentYear = currentYear;
-        await user.save();
       }
       await agenda.schedule(next, 'send birthday', { userId });
 
